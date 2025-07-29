@@ -1,12 +1,10 @@
 // =================== FETCH DATA =====================
 async function fetchCandles(symbol, interval = "15min", limit = 100) {
-    // Mapping interval biar cocok ke Bitget
     let g = interval;
     if (g.endsWith("m")) g = g.replace("m", "min");
     if (g === "1h") g = "1hour";
     if (g === "4h") g = "4hour";
     if (g === "1d") g = "1day";
-    // Add mapping sesuai interval yang kamu pakai
     const url = `https://api.bitget.com/api/v2/spot/market/candles?symbol=${symbol}&granularity=${g}&limit=${limit}`;
     const res = await fetch(url);
     const data = await res.json();
