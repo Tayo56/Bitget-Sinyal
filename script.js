@@ -1,4 +1,3 @@
-// --- Mapping interval untuk Bitget API
 const intervalMap = {
     '1m': '1m',
     '5m': '5m',
@@ -18,14 +17,8 @@ document.getElementById('analyzeBtn').onclick = async function () {
     const interval = document.getElementById('interval').value;
     const bitgetInterval = intervalMap[interval];
 
-    if (!bitgetInterval) {
-        alert('Interval tidak didukung!');
-        return;
-    }
-
     document.getElementById('result-body').innerHTML = `<tr><td colspan="11" style="color:#ffd600">Loading...</td></tr>`;
 
-    // --- API endpoint Bitget
     const url = `https://api.bitget.com/api/v2/mix/market/candles?symbol=${symbol}&granularity=${bitgetInterval}&productType=umcbl&limit=100`;
 
     try {
@@ -37,7 +30,6 @@ document.getElementById('analyzeBtn').onclick = async function () {
             return;
         }
 
-        // --- ambil 60 bar terakhir (biar indikator valid)
         const candles = data.data.slice(0, 60).reverse().map(c => ({
             timestamp: +c[0],
             open: +c[1],
@@ -47,7 +39,6 @@ document.getElementById('analyzeBtn').onclick = async function () {
             volume: +c[5]
         }));
 
-        // --- indikator EMA, MA, RSI, MACD
         function ema(arr, period) {
             let k = 2 / (period + 1);
             let emaPrev = arr.slice(0, period).reduce((a, b) => a + b, 0) / period;
@@ -73,86 +64,62 @@ document.getElementById('analyzeBtn').onclick = async function () {
         function macd(closes, fast = 12, slow = 26, signal = 9) {
             let fastEma = ema(closes, fast);
             let slowEma = ema(closes, slow);
-            let macdLine = fastEma - slowEma;
-            // fake signal line (biar simple)
-            return macdLine;
+            return fastEma - slowEma;
         }
 
         let closes = candles.map(c => c.close);
         let volumes = candles.map(c => c.volume);
 
         let ema9 = ema(closes, 9);
-        let ema12 = ema(closes, 12);
+        let ema21 = ema(closes, 21);
         let ma50 = sma(closes, 50);
         let rsi14 = rsi(closes, 14);
         let macdVal = macd(closes, 12, 26, 9);
 
-        // Support & Resistance = lowest/highest of last 50 bar
         let support = Math.min(...closes.slice(-50));
         let resistance = Math.max(...closes.slice(-50));
-
         let price = closes[closes.length - 1];
 
-        // --- Reason Builder
-        let reason = [];
         let signal = "";
-        let openPos = "HOLD";
+        let reasonArr = [];
+        let openPos = "-";
         let sltp = "-";
 
-        // --- EMA CROSS
-        if (ema9 > ema12) {
-            if (rsi14 > 70) {
-                signal = "SELL";
-                reason.push("EMA9 cross up EMA12");
-                reason.push("- EMA naik, overbought (RSI tinggi)");
-                reason.push("- Waspada reversal/price action.");
-            } else {
-                signal = "BUY";
-                reason.push("EMA9 cross up EMA12");
-                reason.push("- EMA naik, sinyal bullish.");
-            }
+        // SIGNAL UTAMA: EMA 9/21
+        if (ema9 > ema21) {
+            signal = "EMA Cross Up (sedang)";
             openPos = "BUY";
-            sltp = `SL: ${round(support,2)}<br>TP: ${round(resistance,2)}`;
-        } else if (ema9 < ema12) {
-            if (rsi14 < 30) {
-                signal = "BUY";
-                reason.push("EMA9 cross down EMA12");
-                reason.push("- EMA turun, oversold (RSI rendah)");
-                reason.push("- Pantau reversal candlestick.");
-            } else {
-                signal = "SELL";
-                reason.push("EMA9 cross down EMA12");
-                reason.push("- EMA turun, sinyal bearish.");
-            }
+            reasonArr.push("<b>EMA Cross Up (scalping):</b>");
+            reasonArr.push(`- Harga cross up EMA (EMA9 ${round(ema9,2)} > EMA21 ${round(ema21,2)})`);
+            reasonArr.push("- EMA naik");
+        } else if (ema9 < ema21) {
+            signal = "EMA Cross Down (sedang)";
             openPos = "SELL";
-            sltp = `SL: ${round(resistance,2)}<br>TP: ${round(support,2)}`;
+            reasonArr.push("<b>EMA Cross Down (scalping):</b>");
+            reasonArr.push(`- Harga cross down EMA (EMA9 ${round(ema9,2)} < EMA21 ${round(ema21,2)})`);
+            reasonArr.push("- EMA turun");
         } else {
-            signal = "Tidak ada sinyal kuat (EMA 9/12)";
-            reason.push("- EMA9 dan EMA12 mendatar / berdekatan");
-            reason.push("- Tunggu konfirmasi lebih jelas.");
+            signal = "Tidak ada sinyal kuat (EMA 9/21)";
             openPos = "HOLD";
+            reasonArr.push("Tidak ada sinyal kuat, EMA mendatar");
         }
-        // --- RSI
-        reason.push(`---`);
-        reason.push(`RSI: ${round(rsi14,2)}${rsi14 < 30 ? " (Oversold)" : rsi14 > 70 ? " (Overbought)" : ""}`);
-        // --- MA50
-        reason.push(`MA50: ${round(ma50,2)}`);
-        // --- MACD
-        reason.push(`MACD: ${macdVal > 0 ? "Bullish" : "Bearish"}`);
-        // --- Price Action dummy
-        reason.push(`Price Action: Sideways`);
-        // --- Volume dummy
-        let volStatus = volumes[volumes.length-1] > sma(volumes,20) ? "Naik" : "Turun";
-        reason.push(`Volume: ${volStatus}`);
 
-        // Format Reason jadi multi-line rapi
-        let reasonText = reason.join('\n');
+        // REASON PER INDIKATOR
+        reasonArr.push(`<hr style="border:0;border-top:1px solid #ffd600;margin:4px 0">`);
+        reasonArr.push(`<b>RSI</b>: ${round(rsi14,2)} ${rsi14 > 70 ? '(Overbought)' : (rsi14 < 30 ? '(Oversold)' : '')}`);
+        reasonArr.push(`<b>MA50</b>: ${round(ma50,2)}`);
+        reasonArr.push(`<b>MACD</b>: ${macdVal > 0 ? 'Bullish' : 'Bearish'}`);
+        reasonArr.push(`<b>Price Action</b>: Sideways`);
+        let volStatus = volumes[volumes.length-1] > sma(volumes,20) ? "Naik" : "Turun";
+        reasonArr.push(`<b>Volume</b>: ${volStatus}`);
+
+        let reasonHtml = `<ul style="padding-left:18px;margin:0;">` + reasonArr.map(r => 
+            `<li style="margin-bottom:1px">${r}</li>`).join('') + `</ul>`;
 
         // --- LAST UPDATE
         let lastTime = new Date(candles[candles.length - 1].timestamp).toLocaleString("id-ID");
         document.getElementById("lastUpdate").innerHTML = `Data analisa terakhir: ${lastTime}`;
 
-        // --- Output Table
         let html = `<tr>
             <td>★</td>
             <td>${symbol}</td>
@@ -160,11 +127,11 @@ document.getElementById('analyzeBtn').onclick = async function () {
             <td>${round(support,2)}</td>
             <td>${round(resistance,2)}</td>
             <td>${round(rsi14,2)}</td>
-            <td class="signal ${signal.toLowerCase()}">${signal}</td>
-            <td class="reason">${reasonText}</td>
+            <td class="signal">${signal}</td>
+            <td class="reason">${reasonHtml}</td>
             <td>${openPos}</td>
             <td>${sltp}</td>
-            <td><a href="https://www.tradingview.com/chart/?symbol=${symbol.replace('USDT','USDT')}USDT" target="_blank">Chart</a></td>
+            <td><a href="https://www.tradingview.com/chart/?symbol=${symbol}" target="_blank">Chart</a></td>
         </tr>`;
 
         document.getElementById('result-body').innerHTML = html;
