@@ -22,7 +22,6 @@ body {
     margin-left: 24px;
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.2s;
 }
 .nav-links a.active, .nav-links a.donate {
     color: #ffd600;
@@ -39,29 +38,25 @@ h1 {
 .analyzer-controls {
     margin-bottom: 16px;
 }
-.analyzer-controls select,
-.analyzer-controls button {
+.analyzer-controls select, .analyzer-controls button {
     background: #21232b;
     color: #ffd600;
     border: 1px solid #ffd600;
     margin-right: 8px;
     padding: 8px 12px;
     border-radius: 8px;
-    font-size: 1em;
 }
 .analyzer-controls button {
-    cursor: pointer;
     font-weight: bold;
-    transition: background 0.2s;
+    cursor: pointer;
 }
-.analyzer-controls button:hover {
-    background: #ffd600;
-    color: #181A20;
-}
-#analyze-date {
-    margin-bottom: 8px;
+.last-update {
+    margin-bottom: 12px;
     color: #ffd600;
     font-size: 1.1em;
+}
+.table-wrapper {
+    overflow-x: auto;
 }
 #result-table {
     width: 100%;
@@ -74,31 +69,33 @@ h1 {
 }
 #result-table th, #result-table td {
     padding: 10px 6px;
-    text-align: center;
     border-bottom: 1px solid #181A20;
+    text-align: center;
 }
 #result-table th {
     background: #22242e;
     color: #ffd600;
-    font-weight: bold;
 }
-#result-table tr:last-child td {
-    border-bottom: none;
+#result-table td {
+    vertical-align: top;
+    text-align: left;
+    white-space: normal;
 }
-.chart-link {
+.table-reason {
+    color: #ffd600;
+    font-size: 0.97em;
+    text-align: left;
+    white-space: pre-line;
+}
+#result-table tr:hover {
+    background: #1f2229;
+}
+a {
     color: #ffd600;
     text-decoration: underline;
 }
-@media (max-width: 700px) {
-    main {
-        padding: 8px;
-    }
-    #result-table th, #result-table td {
-        padding: 6px 2px;
-        font-size: 0.92em;
-    }
-    .analyzer-controls select, .analyzer-controls button {
-        padding: 6px 4px;
-        font-size: 0.95em;
-    }
+@media (max-width: 600px) {
+    main { padding: 10px 0; }
+    h1 { font-size: 1.4em; }
+    #result-table th, #result-table td { padding: 7px 4px; font-size: 0.9em; }
 }
