@@ -24,11 +24,10 @@
                 <option value="BTCUSDT">BTCUSDT</option>
                 <option value="ETHUSDT">ETHUSDT</option>
             </select>
-            <select id="timeframe">
+            <select id="interval">
                 <option value="1m">1m</option>
-                <option value="3m">3m</option>
                 <option value="5m">5m</option>
-                <option value="15m" selected>15m</option>
+                <option value="15m">15m</option>
                 <option value="30m">30m</option>
                 <option value="1h">1h</option>
                 <option value="4h">4h</option>
@@ -36,29 +35,30 @@
             </select>
             <button id="analyzeBtn">Analyze</button>
         </div>
-        <div id="analyze-date" class="analyze-date"></div>
-        <table id="result-table">
-            <thead>
-                <tr>
-                    <th>★</th>
-                    <th>Symbol</th>
-                    <th>Price</th>
-                    <th>Support</th>
-                    <th>Resistance</th>
-                    <th>RSI</th>
-                    <th>Signal</th>
-                    <th>Reason</th>
-                    <th>Open Posisi</th>
-                    <th>SL/TP</th>
-                    <th>Chart</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be injected here -->
-            </tbody>
-        </table>
+        <div class="last-update" id="lastUpdate"></div>
+        <div class="table-wrapper">
+            <table id="result-table">
+                <thead>
+                    <tr>
+                        <th>★</th>
+                        <th>Symbol</th>
+                        <th>Price</th>
+                        <th>Support</th>
+                        <th>Resistance</th>
+                        <th>RSI</th>
+                        <th>Signal</th>
+                        <th>Reason</th>
+                        <th>Open Posisi</th>
+                        <th>SL/TP</th>
+                        <th>Chart</th>
+                    </tr>
+                </thead>
+                <tbody id="result-body">
+                    <!-- Data akan muncul di sini -->
+                </tbody>
+            </table>
+        </div>
     </main>
-    <footer></footer>
     <script src="script.js"></script>
 </body>
 </html>
