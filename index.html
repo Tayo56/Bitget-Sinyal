@@ -1,369 +1,275 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Single Coin Analyzer - iCrypto</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon"> <style>
-        /* Gaya CSS dasar untuk meniru tampilan */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a; /* Warna latar belakang gelap */
-            color: #f0f0f0; /* Warna teks terang */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .header {
-            background-color: #2b2b2b;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-        }
-
-        .header-left, .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .header-nav a {
-            color: #f0f0f0;
-            text-decoration: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-
-        .header-nav a:hover {
-            background-color: #444;
-        }
-
-        .header-right .balance {
-            background-color: #4CAF50; /* Warna hijau untuk saldo */
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        .header-right .donate-btn {
-            background-color: #ffcc00; /* Warna kuning untuk donasi */
-            color: #333;
-            padding: 5px 10px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .header-right .icon-link {
-            font-size: 1.2em; /* Ukuran ikon */
-            color: #f0f0f0;
-            text-decoration: none;
-        }
-        
-        .header-right .notification-icon {
-            position: relative;
-        }
-
-        .header-right .notification-count {
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.7em;
-            position: absolute;
-            top: -5px;
-            right: -5px;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 20px auto;
-            background-color: #2b2b2b; /* Latar belakang konten */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        h1 {
-            text-align: center;
-            color: #f0f0f0;
-            margin-bottom: 30px;
-        }
-
-        .analyzer-form {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap; /* Untuk responsif */
-        }
-
-        .analyzer-form input[type="text"],
-        .analyzer-form select {
-            padding: 10px 15px;
-            border-radius: 6px;
-            border: 1px solid #555;
-            background-color: #333;
-            color: #f0f0f0;
-            font-size: 1em;
-            outline: none;
-            min-width: 150px;
-        }
-
-        .analyzer-form button {
-            background-color: #ffcc00;
-            color: #333;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .analyzer-form button:hover {
-            background-color: #e6b800;
-        }
-
-        .last-analysis-info {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            color: #aaa;
-        }
-
-        .analysis-results {
-            width: 100%;
-            overflow-x: auto; /* Untuk tabel yang lebar */
-        }
-
-        .analysis-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            margin-top: 20px;
-        }
-
-        .analysis-table th,
-        .analysis-table td {
-            padding: 12px;
-            border-bottom: 1px solid #444;
-            white-space: nowrap; /* Mencegah teks terpotong */
-        }
-
-        .analysis-table th {
-            background-color: #3a3a3a;
-            font-weight: bold;
-            color: #f0f0f0;
-        }
-
-        .analysis-table tr:hover {
-            background-color: #333;
-        }
-
-        .analysis-table .signal-buy {
-            color: #4CAF50; /* Hijau */
-            font-weight: bold;
-        }
-
-        .analysis-table .signal-sell {
-            color: #f44336; /* Merah */
-            font-weight: bold;
-        }
-
-        .analysis-table .chart-link {
-            color: #00bcd4; /* Biru muda */
-            text-decoration: none;
-        }
-        
-        .analysis-table .chart-link:hover {
-            text-decoration: underline;
-        }
-
-        .footer {
-            background-color: #2b2b2b;
-            padding: 15px 20px;
-            text-align: center;
-            border-top: 1px solid #333;
-            margin-top: auto; /* Untuk menempatkan footer di bagian bawah */
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .footer-nav a {
-            color: #f0f0f0;
-            text-decoration: none;
-            padding: 0 15px;
-            font-size: 0.9em;
-        }
-
-        .footer-nav a.active {
-            color: #ffcc00;
-            font-weight: bold;
-        }
-
-        /* Ikon bawah */
-        .footer-icon {
-            font-size: 1.5em;
-            color: #f0f0f0;
-            padding: 0 10px;
-        }
-
-        .footer-icon-active {
-            color: #ffcc00; /* Warna kuning untuk ikon aktif */
-        }
-
-        /* Responsif */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .header-nav {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 5px;
-            }
-            .analyzer-form {
-                flex-direction: column;
-            }
-            .analyzer-form input[type="text"],
-            .analyzer-form select,
-            .analyzer-form button {
-                width: 100%;
-                max-width: 300px; /* Batasi lebar pada layar kecil */
-            }
-            .footer {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-        }
-    </style>
-    </head>
+    <title>Single Coin Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <span>iCrypto</span>
-            <div class="header-nav">
-                <a href="#">Home</a>
-                <a href="#" class="active">Analyze</a>
-                <a href="#">News</a>
-                <a href="#">About</a>
-                <a href="#">Chatroom</a>
-                <a href="#">Bonsai</a>
-            </div>
+    <nav class="top-nav">
+        <span class="logo">iCrypto</span>
+        <div class="nav-links">
+            <a href="#" class="active">Analyze</a>
+            <a href="#">News</a>
+            <a href="#">About</a>
+            <a href="#">Chatroom</a>
+            <a href="#" class="donate">Donasi</a>
         </div>
-        <div class="header-right">
-            <span class="balance">Rp10.000 "mantap lnjt kan"</span>
-            <a href="#" class="donate-btn">
-                ❤️ Donasi
-            </a>
-            <a href="#" class="icon-link">👤</a> <a href="#" class="icon-link notification-icon">
-                🔔<span class="notification-count">73</span> </a>
-            <a href="#" class="icon-link">⚙️</a> </div>
-    </div>
-
-    <div class="main-content">
+    </nav>
+    <main>
         <h1>Single Coin Analyzer</h1>
-
-        <div class="analyzer-form">
-            <input type="text" placeholder="PENGUUSDT" value="PENGUUSDT">
-            <select>
-                <option value="scalping">Scalping</option>
-                <option value="swing">Swing</option>
+        <div class="analyzer-controls">
+            <select id="symbol">
+                <option value="BTCUSDT">BTCUSDT</option>
+                <option value="ETHUSDT">ETHUSDT</option>
             </select>
-            <select>
-                <option value="15m">15m</option>
+            <select id="timeframe">
+                <option value="1m">1m</option>
+                <option value="5m">5m</option>
+                <option value="15m" selected>15m</option>
                 <option value="1h">1h</option>
                 <option value="4h">4h</option>
+                <option value="1d">1d</option>
             </select>
-            <button>Analyze</button>
+            <button id="analyzeBtn">Analyze</button>
         </div>
-
-        <p class="last-analysis-info">
-            🕒 Data analisa kamu terakhir: 28/07/2025, 10:43.14
-        </p>
-
-        <div class="analysis-results">
-            <table class="analysis-table">
-                <thead>
-                    <tr>
-                        <th>BOOKMARK</th>
-                        <th>SYMBOL</th>
-                        <th>LAST PRICE</th>
-                        <th>SUPPORT</th>
-                        <th>RESISTANCE</th>
-                        <th>RSI</th>
-                        <th>SIGNAL</th>
-                        <th>REASON</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>★</td>
-                        <td>PENGUUSDT</td>
-                        <td>0.041128</td>
-                        <td>0.042231</td>
-                        <td>0.045895</td>
-                        <td>45.40</td>
-                        <td class="signal-sell">SELL</td>
-                        <td>EMA Cross Down (sedang). EMA (9) di bawah EMA (20). EMA (9) = 0.0429736, EMA (20) = 0.0428932. RSI di bawah 50. Tidak ada div. kuat beli. Harga masih di bawah level support.</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <table class="analysis-table" style="margin-top: 40px;">
-                <thead>
-                    <tr>
-                        <th>REASON</th>
-                        <th>OPEN POSITION</th>
-                        <th>TP/SL</th>
-                        <th>ESTIMATION PROFIT</th>
-                        <th>CHART</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <p>All Cross Down (Scalping)</p>
-                            <p>EMA (9) = 0.0429736, EMA (20) = 0.0428932</p>
-                            <p>RSI (14) = 45.40</p>
-                            <p>Tidak ada div. kuat beli.</p>
-                            <p>Harga masih di bawah level support.</p>
-                            <p>Menunggu pantulan dari level support</p>
-                        </td>
-                        <td>SELL (P) 0.04287384</td>
-                        <td>
-                            TP1: 0.0423027<br>
-                            TP2: 0.04201713<br>
-                            TP3: 0.04173155<br>
-                            SL: 0.04373655
-                        </td>
-                        <td>
-                            TP1: +1.00%<br>
-                            TP2: +2.00%<br>
-                            TP3: +3.00%
-                        </td>
-                        <td><a href="#" class="chart-link">See Chart</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="footer">
-        <a href="#" class="footer-icon footer-icon-active">🏠</a> <a href="#" class="footer-icon">🔖</a> <a href="#" class="footer-icon">🔎</a> <a href="#" class="footer-icon"></a> <a href="#" class="footer-icon">🔔<span class="notification-count" style="position: static; display: inline-block;">7</span></a> <a href="#" class="footer-icon">☰</a> </div>
+        <div id="analyze-date"></div>
+        <table id="result-table">
+            <thead>
+                <tr>
+                    <th>★</th>
+                    <th>Symbol</th>
+                    <th>Price</th>
+                    <th>Support</th>
+                    <th>Resistance</th>
+                    <th>RSI</th>
+                    <th>Reason</th>
+                    <th>Open Posisi</th>
+                    <th>SL/TP</th>
+                    <th>Chart</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- hasil analisa tampil di sini -->
+            </tbody>
+        </table>
+    </main>
+    <script src="script.js"></script>
 </body>
 </html>
+body {
+    background: #181A20;
+    color: #F4F4F4;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.top-nav {
+    background: #21232b;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.logo {
+    font-weight: bold;
+    color: #ffd600;
+    font-size: 1.3em;
+}
+.nav-links a {
+    color: #F4F4F4;
+    margin-left: 24px;
+    text-decoration: none;
+    font-weight: 500;
+}
+.nav-links a.active, .nav-links a.donate {
+    color: #ffd600;
+}
+main {
+    padding: 32px 16px;
+    max-width: 1000px;
+    margin: auto;
+}
+h1 {
+    margin-bottom: 24px;
+    color: #ffd600;
+}
+.analyzer-controls {
+    margin-bottom: 16px;
+}
+.analyzer-controls select, .analyzer-controls button {
+    background: #21232b;
+    color: #fff;
+    border: 1px solid #ffd600;
+    margin-right: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+#result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: #23262f;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 0.97em;
+}
+#result-table th, #result-table td {
+    padding: 10px 6px;
+    text-align: center;
+    border-bottom: 1px solid #181A20;
+}
+#result-table th {
+    background: #22242e;
+    color: #ffd600;
+}
+a.chart-link {
+    color: #ffd600;
+    text-decoration: underline;
+}
+async function fetchCandles(symbol, interval = "15m", limit = 100) {
+    const url = `https://api.bitget.com/api/v2/spot/market/candles?symbol=${symbol}&granularity=${interval}&limit=${limit}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.data.map(row => ({
+        time: Number(row[0]),
+        open: parseFloat(row[1]),
+        high: parseFloat(row[2]),
+        low: parseFloat(row[3]),
+        close: parseFloat(row[4]),
+        volume: parseFloat(row[5]),
+    })).reverse();
+}
+function sma(data, period) {
+    if (data.length < period) return null;
+    let sum = 0;
+    for (let i = data.length - period; i < data.length; i++) {
+        sum += data[i];
+    }
+    return sum / period;
+}
+function ema(data, period) {
+    if (data.length < period) return null;
+    let k = 2 / (period + 1);
+    let emaPrev = sma(data.slice(0, period), period);
+    for (let i = period; i < data.length; i++) {
+        emaPrev = data[i] * k + emaPrev * (1 - k);
+    }
+    return emaPrev;
+}
+function rsi(data, period = 14) {
+    if (data.length < period + 1) return null;
+    let gains = 0, losses = 0;
+    for (let i = data.length - period; i < data.length; i++) {
+        let diff = data[i] - data[i - 1];
+        if (diff > 0) gains += diff;
+        else losses -= diff;
+    }
+    if (gains + losses === 0) return 50;
+    let rs = gains / (losses || 0.0001);
+    return 100 - (100 / (1 + rs));
+}
+function macd(data, shortPeriod = 12, longPeriod = 26, signalPeriod = 9) {
+    if (data.length < longPeriod + signalPeriod) return { macd: null, signal: null, histogram: null };
+    let emaShort = [], emaLong = [];
+    for (let i = longPeriod - shortPeriod; i < data.length; i++) {
+        emaShort.push(ema(data.slice(0, i + shortPeriod), shortPeriod));
+    }
+    for (let i = 0; i < data.length; i++) {
+        emaLong.push(ema(data.slice(0, i + longPeriod), longPeriod));
+    }
+    let macdLine = [];
+    for (let i = 0; i < emaShort.length; i++) {
+        macdLine.push(emaShort[i] - emaLong[i + (shortPeriod - 1)]);
+    }
+    let signalLine = [];
+    for (let i = signalPeriod - 1; i < macdLine.length; i++) {
+        signalLine.push(ema(macdLine.slice(0, i + 1), signalPeriod));
+    }
+    let latestMacd = macdLine[macdLine.length - 1];
+    let latestSignal = signalLine[signalLine.length - 1];
+    let latestHistogram = latestMacd - latestSignal;
+    return { macd: latestMacd, signal: latestSignal, histogram: latestHistogram };
+}
+
+function getReason(lastPrice, rsiVal, maVal, emaVal, macdVal, closes) {
+    let reasons = [];
+    // RSI
+    if (rsiVal < 30) reasons.push("RSI Oversold");
+    else if (rsiVal > 70) reasons.push("RSI Overbought");
+    else reasons.push("RSI Netral");
+    // MA
+    if (lastPrice > maVal) reasons.push("Price > MA");
+    else reasons.push("Price < MA");
+    // EMA
+    if (lastPrice > emaVal) reasons.push("Price > EMA");
+    else reasons.push("Price < EMA");
+    // MACD
+    if (macdVal.histogram > 0) reasons.push("MACD Bullish");
+    else if (macdVal.histogram < 0) reasons.push("MACD Bearish");
+    else reasons.push("MACD Netral");
+    // Price Action sederhana
+    const trend = closes[closes.length - 1] > closes[closes.length - 4] ? "Uptrend" : "Downtrend";
+    reasons.push(`Price Action: ${trend}`);
+    return reasons.join(", ");
+}
+
+function getOpenPosition(rsiVal, lastPrice, maVal, emaVal, macdVal) {
+    if (rsiVal < 30 && lastPrice > maVal && macdVal.histogram > 0) return "BUY";
+    if (rsiVal > 70 && lastPrice < maVal && macdVal.histogram < 0) return "SELL";
+    if (macdVal.histogram > 0 && lastPrice > emaVal) return "BUY";
+    if (macdVal.histogram < 0 && lastPrice < emaVal) return "SELL";
+    return "HOLD";
+}
+function getSLTP(openPos, support, resistance) {
+    if (openPos === "BUY") return `SL: ${support.toFixed(6)} / TP: ${resistance.toFixed(6)}`;
+    if (openPos === "SELL") return `SL: ${resistance.toFixed(6)} / TP: ${support.toFixed(6)}`;
+    return "-";
+}
+function getChartLink(symbol) {
+    const s = symbol.replace("USDT", "USD");
+    return `https://www.tradingview.com/chart/?symbol=BINANCE:${s}`;
+}
+
+document.getElementById('analyzeBtn').onclick = async function() {
+    const symbol = document.getElementById('symbol').value;
+    const tf = document.getElementById('timeframe').value;
+    document.getElementById('analyze-date').innerText = "Loading...";
+    const candles = await fetchCandles(symbol, tf, 100);
+    if (!candles || candles.length < 30) {
+        document.getElementById('analyze-date').innerText = "Gagal fetch data!";
+        return;
+    }
+    const closes = candles.map(c => c.close);
+    const lastPrice = closes[closes.length - 1];
+    const support = Math.min(...closes.slice(-20));
+    const resistance = Math.max(...closes.slice(-20));
+    const rsiVal = rsi(closes, 14);
+    const maVal = sma(closes, 14);
+    const emaVal = ema(closes, 14);
+    const macdVal = macd(closes);
+
+    const reason = getReason(lastPrice, rsiVal, maVal, emaVal, macdVal, closes);
+    const openPos = getOpenPosition(rsiVal, lastPrice, maVal, emaVal, macdVal);
+    const sltp = getSLTP(openPos, support, resistance);
+    const chartLink = getChartLink(symbol);
+
+    document.getElementById('analyze-date').innerText =
+        "Data analisa terakhir: " + new Date(candles[candles.length - 1].time).toLocaleString();
+    const tbody = document.querySelector('#result-table tbody');
+    tbody.innerHTML = `
+      <tr>
+        <td><span style="font-size:1.3em;cursor:pointer;">☆</span></td>
+        <td>${symbol}</td>
+        <td>${lastPrice.toFixed(6)}</td>
+        <td>${support.toFixed(6)}</td>
+        <td>${resistance.toFixed(6)}</td>
+        <td>${rsiVal ? rsiVal.toFixed(2) : '-'}</td>
+        <td>${reason}</td>
+        <td>${openPos}</td>
+        <td>${sltp}</td>
+        <td><a href="${chartLink}" class="chart-link" target="_blank">Chart</a></td>
+      </tr>
+    `;
+};
