@@ -1,91 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bitget Sinyal</title>
-  <style>
-    body {
-      background-color: #121212;
-      color: #f1f1f1;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #333;
-      text-align: center;
-    }
-    th {
-      background-color: #1e1e1e;
-    }
-    .buy {
-      color: #00ff00;
-      font-weight: bold;
-    }
-    .sell {
-      color: #ff3c3c;
-      font-weight: bold;
-    }
-    .title {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: #ffc107;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Analyzer</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="title">📊 Bitget Analyzer (ETH/USDT - BTC/USDT)</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Bookmark</th>
-        <th>Symbol</th>
-        <th>Last Price</th>
-        <th>Support</th>
-        <th>Resistance</th>
-        <th>RSI</th>
-        <th>Signal</th>
-        <th>Open Posisi</th>
-        <th>TP / SL</th>
-        <th>Reason</th>
-        <th>Chart</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>★</td>
-        <td>ETHUSDT</td>
-        <td>3785.69</td>
-        <td>3740.00</td>
-        <td>3820.00</td>
-        <td>45.2</td>
-        <td>EMA Cross Down</td>
-        <td class="sell">SELL @ 3785.00</td>
-        <td>TP: 3760, SL: 3820</td>
-        <td>- EMA turun, RSI < 50</td>
-        <td><a href="#">Lihat</a></td>
-      </tr>
-      <tr>
-        <td>★</td>
-        <td>BTCUSDT</td>
-        <td>60350.45</td>
-        <td>59800.00</td>
-        <td>61000.00</td>
-        <td>51.7</td>
-        <td>Bullish RSI</td>
-        <td class="buy">BUY @ 60360.00</td>
-        <td>TP: 61000, SL: 59700</td>
-        <td>- RSI naik, harga di atas MA</td>
-        <td><a href="#">Lihat</a></td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="container">
+        <h1>Single Coin Analyzer</h1>
+        <div class="last-updated">
+            Data analisa kamu terakhir: <span id="lastUpdatedDate"></span>
+        </div>
+        <table id="analysisTable">
+            <thead>
+                <tr>
+                    <th>⭐ Bookmark</th>
+                    <th>📛 Symbol</th>
+                    <th>💲 Last Price</th>
+                    <th>📉 Support</th>
+                    <th>📈 Resistance</th>
+                    <th>📊 RSI</th>
+                    <th>⚡ Signal</th>
+                    <th>📍 Open Position</th>
+                    <th>🎯 TP / SL</th>
+                    <th>🧠 Reason</th>
+                    <th>🔗 Chart</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
