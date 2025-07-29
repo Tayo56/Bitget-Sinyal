@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bitget Coin Analysis</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0e0e0e;
+      color: #f1c40f;
+      padding: 20px;
+    }
+    h1 {
+      color: #f1c40f;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #1a1a1a;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #333;
+      text-align: center;
+    }
+    th {
+      background-color: #2c2c2c;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #f1c40f;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #e1b400;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bitget Coin Analysis</h1>
+  <p>Analisa harga crypto real-time dari Bitget. Klik tombol untuk memulai.</p>
+
+  <button onclick="analyzeAll()">Analyzing All</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Symbol</th>
+        <th>Last Price (USDT)</th>
+        <th>Sinyal</th>
+      </tr>
+    </thead>
+    <tbody id="result">
+      <tr><td colspan="3">Klik tombol di atas untuk mulai analisis</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const coins = ["BTCUSDT", "ETHUSDT", "SOLUSDT"];
+
+    async function analyzeAll() {
+      const tbody = document.getElementById("result");
+      tbody.innerHTML = "<tr><td colspan='3'>Loading...</td></tr>";
+
+      const rows = await Promise.all(coins.map(async (symbol) => {
+        try {
+          const res = await fetch(`https://api.bitget.com/api/v2/market/ticker?symbol=${symbol}`);
+          const data = await res.json();
+          const price = parseFloat(data.data.close).toFixed(2);
+
+          // Sinyal dummy: BUY kalau harga naik dari 24h open, SELL kalau turun
+          const change = parseFloat(data.data.change);
+          const signal = change > 0 ? "BUY" : (change < 0 ? "SELL" : "HOLD");
+
+          return `<tr>
+                    <td>${symbol}</td>
+                    <td>${price}</td>
+                    <td>${signal}</td>
+                  </tr>`;
+        } catch (err) {
+          return `<tr><td>${symbol}</td><td colspan='2'>Gagal ambil data</td></tr>`;
+        }
+      }));
+
+      tbody.innerHTML = rows.join("");
+    }
+  </script>
+</body>
+</html>
