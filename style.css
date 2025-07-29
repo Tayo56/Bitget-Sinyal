@@ -122,3 +122,18 @@ h1 {
     main { padding: 12px 3px; }
     h1 { font-size: 1.1em; }
 }
+.table-wrapper {
+    margin-top: 16px;
+    background: #23262f;
+    border-radius: 10px;
+    overflow-x: auto;    /* <--- ini WAJIB! */
+    -webkit-overflow-scrolling: touch; /* Agar smooth di iOS/Android */
+}
+
+#result-table {
+    min-width: 950px; /* Atau lebih besar sesuai kebutuhan */
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+    font-size: .97em;
+}
