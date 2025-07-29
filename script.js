@@ -1,44 +1,3 @@
-async function fetchCandles(symbol, interval = "15min", limit = 100) {
-    const url = `https://api.bitget.com/api/v2/spot/market/candles?symbol=${symbol}&granularity=${interval}&limit=${limit}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    return data.data.map(row => ({
-        time: Number(row[0]),
-        open: parseFloat(row[1]),
-        high: parseFloat(row[2]),
-        low: parseFloat(row[3]),
-        close: parseFloat(row[4]),
-        volume: parseFloat(row[5]),
-    })).reverse();
-}
-
-function sma(data, period) {
-    if (data.length < period) return null;
-    let sum = 0;
-    for (let i = data.length - period; i < data.length; i++) sum += data[i];
-    return sum / period;
-}
-function ema(data, period) {
-    if (data.length < period) return null;
-    let k = 2 / (period + 1);
-    let emaPrev = sma(data.slice(0, period), period);
-    for (let i = period; i < data.length; i++) {
-        emaPrev = data[i] * k + emaPrev * (1 - k);
-    }
-    return emaPrev;
-}
-function rsi(data, period = 14) {
-    if (data.length < period + 1) return null;
-    let gains = 0, losses = 0;
-    for (let i = data.length - period; i < data.length; i++) {
-        let diff = data[i] - data[i - 1];
-        if (diff > 0) gains += diff;
-        else losses -= diff;
-    }
-    if (gains + losses === 0) return 50;
-    let rs = gains / (losses || 0.0001);
-    return 100 - (100 / (1 + rs));
-}
 function macd(data, shortPeriod = 12, longPeriod = 26, signalPeriod = 9) {
     if (data.length < longPeriod + signalPeriod) return { macd: null, signal: null, histogram: null };
     let emaShort = [], emaLong = [];
@@ -71,50 +30,32 @@ function getPriceAction(closes) {
     return "Sideways";
 }
 
-function getSignalAndReasonEMA912(closes, lastPrice, ema9, prevEma9, ema12, prevEma12, rsiVal, ma50, macdVal, priceAction) {
-    let signal = "Tidak ada sinyal kuat (EMA 9/12)";
-    let reason = [];
-
-    // EMA 9/12 Cross Down
-    if (prevEma9 > prevEma12 && ema9 < ema12) {
-        signal = "EMA Cross Down (scalping)";
-        reason.push(`- Harga cross down EMA (${lastPrice.toFixed(2)} < ${ema12.toFixed(2)})`);
-        reason.push(`- EMA turun (${ema12.toFixed(2)} < ${prevEma12.toFixed(2)})`);
-        reason.push(`- RSI melemah (${rsiVal !== null ? rsiVal.toFixed(2) : '-'})`);
-        reason.push(`- Tidak ada price action, sinyal sedang`);
-        reason.push(`- Tidak ada doji, sinyal kuat`);
-        reason.push("Sinyal bearish sedang, tetap perhatikan level support.");
-    }
-    // EMA 9/12 Cross Up
-    else if (prevEma9 < prevEma12 && ema9 > ema12) {
-        signal = "EMA Cross Up (scalping)";
-        reason.push(`- Harga cross up EMA (${lastPrice.toFixed(2)} > ${ema12.toFixed(2)})`);
-        reason.push(`- EMA naik (${ema12.toFixed(2)} > ${prevEma12.toFixed(2)})`);
-        reason.push(`- RSI menguat (${rsiVal !== null ? rsiVal.toFixed(2) : '-'})`);
-        reason.push(`- Tidak ada price action, sinyal sedang`);
-        reason.push(`- Tidak ada doji, sinyal kuat`);
-        reason.push("Sinyal bullish sedang, tetap perhatikan level resistance.");
-    } else {
-        signal = "Tidak ada sinyal kuat (EMA 9/12)";
-        reason.push(`ATR: - , EMA9: ${ema9 !== null ? ema9.toFixed(2) : '-'}, EMA12: ${ema12 !== null ? ema12.toFixed(2) : '-'}, MA50: ${ma50 !== null ? ma50.toFixed(2) : '-'}, RSI: ${rsiVal !== null ? rsiVal.toFixed(2) : '-'} `);
-        reason.push("Tunggu konfirmasi lebih jelas dari indikator.");
-    }
-    return { signal, reason };
+function getVolumeStatus(volumes) {
+    const len = volumes.length;
+    const recent = volumes.slice(len - 5, len);
+    const prev = volumes.slice(len - 10, len - 5);
+    const avgRecent = recent.reduce((a, b) => a + b, 0) / recent.length;
+    const avgPrev = prev.reduce((a, b) => a + b, 0) / prev.length;
+    if (avgRecent > avgPrev * 1.2) return "Naik";
+    if (avgRecent < avgPrev * 0.8) return "Turun";
+    return "Stabil";
 }
 
-function getOpenPosition(signal) {
-    if (signal.includes("Cross Down")) return "SELL";
-    if (signal.includes("Cross Up")) return "BUY";
-    return "HOLD";
+// Reason baris (horizontal, semua indikator selalu tampil)
+function getReasonRow(ema9, ema12, ma50, rsiVal, macdVal, priceAction, volStat) {
+    let macdSignal = "-";
+    if (macdVal && macdVal.histogram !== null) {
+        if (macdVal.histogram > 0) macdSignal = "Bullish";
+        else if (macdVal.histogram < 0) macdSignal = "Bearish";
+        else macdSignal = "Netral";
+    }
+    return `EMA9: ${ema9 !== null ? ema9.toFixed(2) : "-"}, EMA12: ${ema12 !== null ? ema12.toFixed(2) : "-"}, MA50: ${ma50 !== null ? ma50.toFixed(2) : "-"}, RSI: ${rsiVal !== null ? rsiVal.toFixed(2) : "-"}, MACD: ${macdSignal}, Price Action: ${priceAction}, Volume: ${volStat}`;
 }
-function getSLTP(openPos, support, resistance) {
-    if (openPos === "BUY") return `SL: ${support.toFixed(2)}<br>TP: ${resistance.toFixed(2)}`;
-    if (openPos === "SELL") return `SL: ${resistance.toFixed(2)}<br>TP: ${support.toFixed(2)}`;
-    return "-";
-}
-function getChartLink(symbol) {
-    const s = symbol.replace("USDT", "USD");
-    return `https://www.tradingview.com/chart/?symbol=BINANCE:${s}`;
+
+function getSignal(closes, ema9, prevEma9, ema12, prevEma12) {
+    if (prevEma9 > prevEma12 && ema9 < ema12) return "EMA Cross Down (scalping)";
+    if (prevEma9 < prevEma12 && ema9 > ema12) return "EMA Cross Up (scalping)";
+    return "Tidak ada sinyal kuat (EMA 9/12)";
 }
 
 document.getElementById('analyzeBtn').onclick = async function() {
@@ -133,6 +74,7 @@ document.getElementById('analyzeBtn').onclick = async function() {
         return;
     }
     const closes = candles.map(c => c.close);
+    const volumes = candles.map(c => c.volume);
     const lastPrice = closes[closes.length - 1];
     const support = Math.min(...closes.slice(-20));
     const resistance = Math.max(...closes.slice(-20));
@@ -144,15 +86,18 @@ document.getElementById('analyzeBtn').onclick = async function() {
     const prevEma12 = ema(closes.slice(0, closes.length - 1), 12);
     const macdVal = macd(closes);
     const priceAction = getPriceAction(closes);
+    const volStat = getVolumeStatus(volumes);
 
-    const { signal, reason } = getSignalAndReasonEMA912(
-        closes, lastPrice, ema9, prevEma9, ema12, prevEma12, rsiVal, ma50, macdVal, priceAction
-    );
+    const signal = getSignal(closes, ema9, prevEma9, ema12, prevEma12);
+    const reason = getReasonRow(ema9, ema12, ma50, rsiVal, macdVal, priceAction, volStat);
 
-    const reasonHtml = `<ul class="reason-list">${reason.map(r => `<li>${r}</li>`).join('')}</ul>`;
-    const openPos = getOpenPosition(signal);
-    const sltp = getSLTP(openPos, support, resistance);
-    const chartLink = getChartLink(symbol);
+    const openPos = signal.includes("Down") ? "SELL" : signal.includes("Up") ? "BUY" : "HOLD";
+    const sltp = openPos === "BUY"
+        ? `SL: ${support.toFixed(2)}<br>TP: ${resistance.toFixed(2)}`
+        : openPos === "SELL"
+        ? `SL: ${resistance.toFixed(2)}<br>TP: ${support.toFixed(2)}`
+        : "-";
+    const chartLink = `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol.replace("USDT", "USD")}`;
 
     document.getElementById('analyze-date').innerText =
         "Data analisa terakhir: " + new Date(candles[candles.length - 1].time).toLocaleString();
@@ -167,7 +112,7 @@ document.getElementById('analyzeBtn').onclick = async function() {
         <td>${resistance.toFixed(2)}</td>
         <td>${rsiVal !== null ? rsiVal.toFixed(2) : '-'}</td>
         <td><b>${signal}</b></td>
-        <td>${reasonHtml}</td>
+        <td style="white-space:pre-line">${reason}</td>
         <td>${openPos}</td>
         <td>${sltp}</td>
         <td><a href="${chartLink}" class="chart-link" target="_blank">Chart</a></td>
