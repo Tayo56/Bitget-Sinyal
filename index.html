@@ -1,92 +1,369 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Single Coin Analyzer</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <title>Single Coin Analyzer - iCrypto</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"> <style>
+        /* Gaya CSS dasar untuk meniru tampilan */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a; /* Warna latar belakang gelap */
+            color: #f0f0f0; /* Warna teks terang */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #2b2b2b;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .header-nav a:hover {
+            background-color: #444;
+        }
+
+        .header-right .balance {
+            background-color: #4CAF50; /* Warna hijau untuk saldo */
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .header-right .donate-btn {
+            background-color: #ffcc00; /* Warna kuning untuk donasi */
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header-right .icon-link {
+            font-size: 1.2em; /* Ukuran ikon */
+            color: #f0f0f0;
+            text-decoration: none;
+        }
+        
+        .header-right .notification-icon {
+            position: relative;
+        }
+
+        .header-right .notification-count {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7em;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #2b2b2b; /* Latar belakang konten */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #f0f0f0;
+            margin-bottom: 30px;
+        }
+
+        .analyzer-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap; /* Untuk responsif */
+        }
+
+        .analyzer-form input[type="text"],
+        .analyzer-form select {
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #f0f0f0;
+            font-size: 1em;
+            outline: none;
+            min-width: 150px;
+        }
+
+        .analyzer-form button {
+            background-color: #ffcc00;
+            color: #333;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .analyzer-form button:hover {
+            background-color: #e6b800;
+        }
+
+        .last-analysis-info {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .analysis-results {
+            width: 100%;
+            overflow-x: auto; /* Untuk tabel yang lebar */
+        }
+
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .analysis-table th,
+        .analysis-table td {
+            padding: 12px;
+            border-bottom: 1px solid #444;
+            white-space: nowrap; /* Mencegah teks terpotong */
+        }
+
+        .analysis-table th {
+            background-color: #3a3a3a;
+            font-weight: bold;
+            color: #f0f0f0;
+        }
+
+        .analysis-table tr:hover {
+            background-color: #333;
+        }
+
+        .analysis-table .signal-buy {
+            color: #4CAF50; /* Hijau */
+            font-weight: bold;
+        }
+
+        .analysis-table .signal-sell {
+            color: #f44336; /* Merah */
+            font-weight: bold;
+        }
+
+        .analysis-table .chart-link {
+            color: #00bcd4; /* Biru muda */
+            text-decoration: none;
+        }
+        
+        .analysis-table .chart-link:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            background-color: #2b2b2b;
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #333;
+            margin-top: auto; /* Untuk menempatkan footer di bagian bawah */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .footer-nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            padding: 0 15px;
+            font-size: 0.9em;
+        }
+
+        .footer-nav a.active {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+
+        /* Ikon bawah */
+        .footer-icon {
+            font-size: 1.5em;
+            color: #f0f0f0;
+            padding: 0 10px;
+        }
+
+        .footer-icon-active {
+            color: #ffcc00; /* Warna kuning untuk ikon aktif */
+        }
+
+        /* Responsif */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .header-nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 5px;
+            }
+            .analyzer-form {
+                flex-direction: column;
+            }
+            .analyzer-form input[type="text"],
+            .analyzer-form select,
+            .analyzer-form button {
+                width: 100%;
+                max-width: 300px; /* Batasi lebar pada layar kecil */
+            }
+            .footer {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
+    </head>
 <body>
-    <div class="top-bar">
-        <div class="top-bar-content">
-            <span class="logo">iCrypto</span>
-            <div class="nav-links">
-                <a href="#" class="nav-item">Home</a>
-                <a href="#" class="nav-item active">Analyze</a>
-                <a href="#" class="nav-item">News</a>
-                <a href="#" class="nav-item">About</a>
-                <a href="#" class="nav-item">Chatroom</a>
-                <a href="#" class="nav-item donate">Donasi</a>
+    <div class="header">
+        <div class="header-left">
+            <span>iCrypto</span>
+            <div class="header-nav">
+                <a href="#">Home</a>
+                <a href="#" class="active">Analyze</a>
+                <a href="#">News</a>
+                <a href="#">About</a>
+                <a href="#">Chatroom</a>
+                <a href="#">Bonsai</a>
             </div>
-            <div class="user-info">
-                <span class="balance">Rp10.000</span>
-                <span class="user-icon">👤</span> <span class="notif-icon">🔔<span>73</span></span> </div>
+        </div>
+        <div class="header-right">
+            <span class="balance">Rp10.000 "mantap lnjt kan"</span>
+            <a href="#" class="donate-btn">
+                ❤️ Donasi
+            </a>
+            <a href="#" class="icon-link">👤</a> <a href="#" class="icon-link notification-icon">
+                🔔<span class="notification-count">73</span> </a>
+            <a href="#" class="icon-link">⚙️</a> </div>
+    </div>
+
+    <div class="main-content">
+        <h1>Single Coin Analyzer</h1>
+
+        <div class="analyzer-form">
+            <input type="text" placeholder="PENGUUSDT" value="PENGUUSDT">
+            <select>
+                <option value="scalping">Scalping</option>
+                <option value="swing">Swing</option>
+            </select>
+            <select>
+                <option value="15m">15m</option>
+                <option value="1h">1h</option>
+                <option value="4h">4h</option>
+            </select>
+            <button>Analyze</button>
+        </div>
+
+        <p class="last-analysis-info">
+            🕒 Data analisa kamu terakhir: 28/07/2025, 10:43.14
+        </p>
+
+        <div class="analysis-results">
+            <table class="analysis-table">
+                <thead>
+                    <tr>
+                        <th>BOOKMARK</th>
+                        <th>SYMBOL</th>
+                        <th>LAST PRICE</th>
+                        <th>SUPPORT</th>
+                        <th>RESISTANCE</th>
+                        <th>RSI</th>
+                        <th>SIGNAL</th>
+                        <th>REASON</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>★</td>
+                        <td>PENGUUSDT</td>
+                        <td>0.041128</td>
+                        <td>0.042231</td>
+                        <td>0.045895</td>
+                        <td>45.40</td>
+                        <td class="signal-sell">SELL</td>
+                        <td>EMA Cross Down (sedang). EMA (9) di bawah EMA (20). EMA (9) = 0.0429736, EMA (20) = 0.0428932. RSI di bawah 50. Tidak ada div. kuat beli. Harga masih di bawah level support.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="analysis-table" style="margin-top: 40px;">
+                <thead>
+                    <tr>
+                        <th>REASON</th>
+                        <th>OPEN POSITION</th>
+                        <th>TP/SL</th>
+                        <th>ESTIMATION PROFIT</th>
+                        <th>CHART</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <p>All Cross Down (Scalping)</p>
+                            <p>EMA (9) = 0.0429736, EMA (20) = 0.0428932</p>
+                            <p>RSI (14) = 45.40</p>
+                            <p>Tidak ada div. kuat beli.</p>
+                            <p>Harga masih di bawah level support.</p>
+                            <p>Menunggu pantulan dari level support</p>
+                        </td>
+                        <td>SELL (P) 0.04287384</td>
+                        <td>
+                            TP1: 0.0423027<br>
+                            TP2: 0.04201713<br>
+                            TP3: 0.04173155<br>
+                            SL: 0.04373655
+                        </td>
+                        <td>
+                            TP1: +1.00%<br>
+                            TP2: +2.00%<br>
+                            TP3: +3.00%
+                        </td>
+                        <td><a href="#" class="chart-link">See Chart</a></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="main-content-wrapper">
-        <div class="coin-analyzer-section">
-            <h1 class="section-title">Single Coin Analyzer</h1>
-            <div class="analyzer-controls">
-                <select class="control-dropdown yellow-border">
-                    <option>PENGA/USDT</option>
-                    </select>
-                <select class="control-dropdown yellow-border">
-                    <option>Scalping</option>
-                    </select>
-                <select class="control-dropdown yellow-border">
-                    <option>15m</option>
-                    </select>
-                <button class="analyze-button">Analyze</button>
-            </div>
-            <div class="last-updated">
-                Data analisa kamu terakhir: <span id="lastUpdatedDate"></span>
-            </div>
-
-            <div class="table-container summary-table">
-                <table id="summaryTable">
-                    <thead>
-                        <tr>
-                            <th>BOOKMARK</th>
-                            <th>SYMBOL</th>
-                            <th>LAST PRICE</th>
-                            <th>SUPPORT</th>
-                            <th>RESISTANCE</th>
-                            <th>RSI</th>
-                            <th>SIGNAL</th>
-                            <th>REASON</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-
-            <div class="table-container detailed-analysis-table">
-                <table id="detailedAnalysisTable">
-                    <thead>
-                        <tr>
-                            <th>REASON</th>
-                            <th>OPEN POSITION</th>
-                            <th>TP/SL</th>
-                            <th>ESTIMATION PROFIT</th>
-                            <th>CHART</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="bottom-nav-bar">
-        <a href="#" class="nav-icon"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEwIDIwVjE0SDoxNFYyMEgyMFYxMEgyM0wxMiAzTDEgMTBIM1YyMEg5VjE0SDEwWiIgZmlsbD0iI2YwZjBmMCIvPjwvc3ZnPg==" alt="Home"></a>
-        <a href="#" class="nav-icon"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQgZmllc3RzPSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE5IDVDMTguNDQ3NzEgNSAxOC4wNjE0MiA1LjIxMTYyIDE3LjgxNzExIDUuNTYwNTdMMTIgMTIuODQ5MjFMNi4xODIyOSAxOC40MzQ5OEM1LjkzNjk4IDE4Ljc4MzkyIDUuNTUzNjUgMTkgNS4wMDAwMyAxOUgzTDEyIDExTDcgNUgxOVoiIGZpbGw9IiNmMGYwZjAiLz48L3N2Zz4=" alt="Bookmark"></a>
-        <a href="#" class="nav-icon"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQgZmllc3RzPSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE2LjUgMTcuNWwzLjUgMy41TDIxLjUgMjFMMTcgMTYuNUwxNi41IDE2LjkzNTM2TDExIDExLjQzNTM2QzkuOTA5NjQgMTAuMzU2MiA5LjI1IDguODUxNTkgOS4yNSA3LjM3NTAyQzkuMjUgNC40MTYwMyAxMS42OTEgMiAxNC42NDI3NyAyQzE3LjY2NjQgMiAyMCA0LjQwNzYyIDIwIDcuMzc1MDJDYS45NzQ4Ny45NzQ4NyAwIDAwLS4xNjMyNC4wMTc1NEwxNi41IDE2LjkzNTM2VjE3LjVaTTE0LjY0Mjc3IDRDMTIuNzIxMDYgNCAxMS4yNSA1LjUzMjM2IDExLjI1IDcuMzc1MDJDMTEuMjUgOS4yMjMxNSAxMi43MzI4IDExLjAwMzI2IDE0LjY0Mjc3IDExLjAwMzI2QzE2LjQ3Mjk5IDExLjAwMzI2IDE3Ljk5OTg5IDkuNTY4MDUgMTguMDAwMDQgNy4zNzUwMkMxOC4wMDAxNCA1LjIyNjkxIDE2LjY0MDk1IDQgMTQuNjQyNzcgNFoiIGZpbGw9IiNmMGYwZjAiLz48L3N2Zz4=" alt="Search"></a>
-        <a href="#" class="nav-icon active-nav-item">7</a> <a href="#" class="nav-icon"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQgZmllc3RzPSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDJDMTcuNTIyODIgMiAyMiA2LjQ3NzE4IDIyIDEyQzIyIDE2LjExMTY0IDE5LjM1MDk3IDE5LjY3MzAyIDE1LjY4OTQyIDIxLjAwNDkyTDEyLjM1MTA0IDIyLjUzMjAxQzEyLjEzNzc1IDIyLjY1MjI2IDEyIDIyLjY2NDcgMTIgMjJDMTIgMjEuOTgzOTcgMTEuODY1MzYgMjEuOTc3NyAxMS44MDczMyAyMS45NTYxNEM1LjA1NDI4IDE5LjM5MDQ0IDIgMTUuMjY4MTQgMiAxMkMyIDYuNDc3MTggNi40NzcxOCAyIDEyIDJaTTIzIDIxVjIzSDExVjIxTDIzIDIxWiIgZmlsbD0iI2YwZjBmMCIvPjwvc3ZnPg==" alt="Menu"></a>
-    </div>
-
-    <script src="script.js"></script>
+    <div class="footer">
+        <a href="#" class="footer-icon footer-icon-active">🏠</a> <a href="#" class="footer-icon">🔖</a> <a href="#" class="footer-icon">🔎</a> <a href="#" class="footer-icon"></a> <a href="#" class="footer-icon">🔔<span class="notification-count" style="position: static; display: inline-block;">7</span></a> <a href="#" class="footer-icon">☰</a> </div>
 </body>
 </html>
