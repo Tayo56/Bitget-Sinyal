@@ -11,6 +11,7 @@ async function fetchCandles(symbol, interval = "15m", limit = 100) {
         volume: parseFloat(row[5]),
     })).reverse();
 }
+
 function sma(data, period) {
     if (data.length < period) return null;
     let sum = 0;
@@ -105,12 +106,8 @@ function getChartLink(symbol) {
 document.getElementById('analyzeBtn').onclick = async function() {
     const symbol = document.getElementById('symbol').value;
     const tf = document.getElementById('timeframe').value;
-    document.getElementById('analyze-date').innerText = "Loading...";
     const candles = await fetchCandles(symbol, tf, 100);
-    if (!candles || candles.length < 30) {
-        document.getElementById('analyze-date').innerText = "Gagal fetch data!";
-        return;
-    }
+    if (!candles || candles.length < 30) return;
     const closes = candles.map(c => c.close);
     const lastPrice = closes[closes.length - 1];
     const support = Math.min(...closes.slice(-20));
@@ -125,8 +122,6 @@ document.getElementById('analyzeBtn').onclick = async function() {
     const sltp = getSLTP(openPos, support, resistance);
     const chartLink = getChartLink(symbol);
 
-    document.getElementById('analyze-date').innerText =
-        "Data analisa terakhir: " + new Date(candles[candles.length - 1].time).toLocaleString();
     const tbody = document.querySelector('#result-table tbody');
     tbody.innerHTML = `
       <tr>
