@@ -3,34 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Analyzer</title>
+    <title>Single Coin Analyzer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Single Coin Analyzer</h1>
-        <div class="last-updated">
-            Data analisa kamu terakhir: <span id="lastUpdatedDate"></span>
+    <div class="top-bar">
+        <div class="top-bar-content">
+            <span class="logo">iCrypto</span>
+            <div class="nav-links">
+                <a href="#" class="nav-item">Home</a>
+                <a href="#" class="nav-item active">Analyze</a>
+                <a href="#" class="nav-item">News</a>
+                <a href="#" class="nav-item">About</a>
+                <a href="#" class="nav-item">Chatroom</a>
+                <a href="#" class="nav-item donate">Donasi</a>
+            </div>
+            <div class="user-info">
+                <span class="balance">Rp10.000</span>
+                <span class="user-icon">👤</span> <span class="notif-icon">🔔<span>73</span></span> </div>
         </div>
-        <table id="analysisTable">
-            <thead>
-                <tr>
-                    <th>⭐ Bookmark</th>
-                    <th>📛 Symbol</th>
-                    <th>💲 Last Price</th>
-                    <th>📉 Support</th>
-                    <th>📈 Resistance</th>
-                    <th>📊 RSI</th>
-                    <th>⚡ Signal</th>
-                    <th>📍 Open Position</th>
-                    <th>🎯 TP / SL</th>
-                    <th>🧠 Reason</th>
-                    <th>🔗 Chart</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-        </table>
+    </div>
+
+    <div class="main-content-wrapper">
+        <div class="coin-analyzer-section">
+            <h1 class="section-title">Single Coin Analyzer</h1>
+            <div class="analyzer-controls">
+                <select class="control-dropdown yellow-border">
+                    <option>PENGA/USDT</option>
+                    </select>
+                <select class="control-dropdown yellow-border">
+                    <option>Scalping</option>
+                    </select>
+                <select class="control-dropdown yellow-border">
+                    <option>15m</option>
+                    </select>
+                <button class="analyze-button">Analyze</button>
+            </div>
+            <div class="last-updated">
+                Data analisa kamu terakhir: <span id="lastUpdatedDate"></span>
+            </div>
+
+            <div class="table-container summary-table">
+                <table id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th>BOOKMARK</th>
+                            <th>SYMBOL</th>
+                            <th>LAST PRICE</th>
+                            <th>SUPPORT</th>
+                            <th>RESISTANCE</th>
+                            <th>RSI</th>
+                            <th>SIGNAL</th>
+                            <th>REASON</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="table-container detailed-analysis-table">
+                <table id="detailedAnalysisTable">
+                    <thead>
+                        <tr>
+                            <th>REASON</th>
+                            <th>OPEN POSITION</th>
+                            <th>TP/SL</th>
+                            <th>ESTIMATION PROFIT</th>
+                            <th>CHART</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav-bar">
+        <a href="#" class="nav-icon"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEwIDIwVjE0SDoxNFYyMEgyMFYxMEgyM0wxMiAzTDEgMTBIM1YyMEg5VjE0SDEwWiIgZmlsbD0iI2YwZjBmMCIvPjwvc3ZnPg==" alt="Home"></a>
+        <a href="#" class="nav-icon"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQgZmllc3RzPSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE5IDVDMTguNDQ3NzEgNSAxOC4wNjE0MiA1LjIxMTYyIDE3LjgxNzExIDUuNTYwNTdMMTIgMTIuODQ5MjFMNi4xODIyOSAxOC40MzQ5OEM1LjkzNjk4IDE4Ljc4MzkyIDUuNTUzNjUgMTkgNS4wMDAwMyAxOUgzTDEyIDExTDcgNUgxOVoiIGZpbGw9IiNmMGYwZjAiLz48L3N2Zz4=" alt="Bookmark"></a>
+        <a href="#" class="nav-icon"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQgZmllc3RzPSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE2LjUgMTcuNWwzLjUgMy41TDIxLjUgMjFMMTcgMTYuNUwxNi41IDE2LjkzNTM2TDExIDExLjQzNTM2QzkuOTA5NjQgMTAuMzU2MiA5LjI1IDguODUxNTkgOS4yNSA3LjM3NTAyQzkuMjUgNC40MTYwMyAxMS42OTEgMiAxNC42NDI3NyAyQzE3LjY2NjQgMiAyMCA0LjQwNzYyIDIwIDcuMzc1MDJDYS45NzQ4Ny45NzQ4NyAwIDAwLS4xNjMyNC4wMTc1NEwxNi41IDE2LjkzNTM2VjE3LjVaTTE0LjY0Mjc3IDRDMTIuNzIxMDYgNCAxMS4yNSA1LjUzMjM2IDExLjI1IDcuMzc1MDJDMTEuMjUgOS4yMjMxNSAxMi43MzI4IDExLjAwMzI2IDE0LjY0Mjc3IDExLjAwMzI2QzE2LjQ3Mjk5IDExLjAwMzI2IDE3Ljk5OTg5IDkuNTY4MDUgMTguMDAwMDQgNy4zNzUwMkMxOC4wMDAxNCA1LjIyNjkxIDE2LjY0MDk1IDQgMTQuNjQyNzcgNFoiIGZpbGw9IiNmMGYwZjAiLz48L3N2Zz4=" alt="Search"></a>
+        <a href="#" class="nav-icon active-nav-item">7</a> <a href="#" class="nav-icon"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQgZmllc3RzPSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDJDMTcuNTIyODIgMiAyMiA2LjQ3NzE4IDIyIDEyQzIyIDE2LjExMTY0IDE5LjM1MDk3IDE5LjY3MzAyIDE1LjY4OTQyIDIxLjAwNDkyTDEyLjM1MTA0IDIyLjUzMjAxQzEyLjEzNzc1IDIyLjY1MjI2IDEyIDIyLjY2NDcgMTIgMjJDMTIgMjEuOTgzOTcgMTEuODY1MzYgMjEuOTc3NyAxMS44MDczMyAyMS45NTYxNEM1LjA1NDI4IDE5LjM5MDQ0IDIgMTUuMjY4MTQgMiAxMkMyIDYuNDc3MTggNi40NzcxOCAyIDEyIDJaTTIzIDIxVjIzSDExVjIxTDIzIDIxWiIgZmlsbD0iI2YwZjBmMCIvPjwvc3ZnPg==" alt="Menu"></a>
     </div>
 
     <script src="script.js"></script>
