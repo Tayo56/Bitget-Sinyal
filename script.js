@@ -112,8 +112,8 @@ function getOpenPosition(signal) {
     return "HOLD";
 }
 function getSLTP(openPos, support, resistance) {
-    if (openPos === "BUY") return `SL: ${support.toFixed(6)}<br>TP: ${resistance.toFixed(6)}`;
-    if (openPos === "SELL") return `SL: ${resistance.toFixed(6)}<br>TP: ${support.toFixed(6)}`;
+    if (openPos === "BUY") return `SL: ${support.toFixed(2)}<br>TP: ${resistance.toFixed(2)}`;
+    if (openPos === "SELL") return `SL: ${resistance.toFixed(2)}<br>TP: ${support.toFixed(2)}`;
     return "-";
 }
 function getChartLink(symbol) {
@@ -165,14 +165,12 @@ document.getElementById('analyzeBtn').onclick = async function() {
       <tr>
         <td><span style="font-size:1.3em;cursor:pointer;">☆</span></td>
         <td>${symbol}</td>
-        <td>${lastPrice.toFixed(6)}</td>
-        <td>${support.toFixed(6)}</td>
-        <td>${resistance.toFixed(6)}</td>
+        <td>${lastPrice.toFixed(2)}</td>
+        <td>${support.toFixed(2)}</td>
+        <td>${resistance.toFixed(2)}</td>
         <td>${rsiVal ? rsiVal.toFixed(2) : '-'}</td>
-        <td>
-          <b>${signal}</b>
-          ${reasonHtml}
-        </td>
+        <td><b>${signal}</b></td>
+        <td>${reasonHtml}</td>
         <td>${openPos}</td>
         <td>${sltp}</td>
         <td><a href="${chartLink}" class="chart-link" target="_blank">Chart</a></td>
