@@ -80,11 +80,23 @@ h1 {
 }
 #result-table td {
     color: #F4F4F4;
+    vertical-align: top;
 }
 #result-table td.reason {
     text-align: left;
     white-space: pre-line;
     font-size: .97em;
+    min-width: 200px;
+}
+#result-table td.reason ul {
+    margin: 0;
+    padding-left: 17px;
+}
+#result-table td.reason li {
+    margin-bottom: 2px;
+    line-height: 1.4em;
+    color: #ffd600;
+    font-size: 0.97em;
 }
 #result-table td.signal {
     font-weight: bold;
