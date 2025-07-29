@@ -1,96 +1,91 @@
-
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bitget Coin Analysis</title>
+  <title>Bitget Sinyal</title>
   <style>
     body {
+      background-color: #121212;
+      color: #f1f1f1;
       font-family: Arial, sans-serif;
-      background-color: #0e0e0e;
-      color: #f1c40f;
       padding: 20px;
-    }
-    h1 {
-      color: #f1c40f;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      background-color: #1a1a1a;
+      margin-top: 16px;
     }
     th, td {
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #333;
       text-align: center;
     }
     th {
-      background-color: #2c2c2c;
+      background-color: #1e1e1e;
     }
-    button {
-      padding: 10px 20px;
-      background-color: #f1c40f;
-      border: none;
-      color: #000;
+    .buy {
+      color: #00ff00;
       font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
     }
-    button:hover {
-      background-color: #e1b400;
+    .sell {
+      color: #ff3c3c;
+      font-weight: bold;
+    }
+    .title {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #ffc107;
     }
   </style>
 </head>
 <body>
-  <h1>Bitget Coin Analysis</h1>
-  <p>Analisa harga crypto real-time dari Bitget. Klik tombol untuk memulai.</p>
-
-  <button onclick="analyzeAll()">Analyzing All</button>
-
+  <div class="title">📊 Bitget Analyzer (ETH/USDT - BTC/USDT)</div>
   <table>
     <thead>
       <tr>
+        <th>Bookmark</th>
         <th>Symbol</th>
-        <th>Last Price (USDT)</th>
-        <th>Sinyal</th>
+        <th>Last Price</th>
+        <th>Support</th>
+        <th>Resistance</th>
+        <th>RSI</th>
+        <th>Signal</th>
+        <th>Open Posisi</th>
+        <th>TP / SL</th>
+        <th>Reason</th>
+        <th>Chart</th>
       </tr>
     </thead>
-    <tbody id="result">
-      <tr><td colspan="3">Klik tombol di atas untuk mulai analisis</td></tr>
+    <tbody>
+      <tr>
+        <td>★</td>
+        <td>ETHUSDT</td>
+        <td>3785.69</td>
+        <td>3740.00</td>
+        <td>3820.00</td>
+        <td>45.2</td>
+        <td>EMA Cross Down</td>
+        <td class="sell">SELL @ 3785.00</td>
+        <td>TP: 3760, SL: 3820</td>
+        <td>- EMA turun, RSI < 50</td>
+        <td><a href="#">Lihat</a></td>
+      </tr>
+      <tr>
+        <td>★</td>
+        <td>BTCUSDT</td>
+        <td>60350.45</td>
+        <td>59800.00</td>
+        <td>61000.00</td>
+        <td>51.7</td>
+        <td>Bullish RSI</td>
+        <td class="buy">BUY @ 60360.00</td>
+        <td>TP: 61000, SL: 59700</td>
+        <td>- RSI naik, harga di atas MA</td>
+        <td><a href="#">Lihat</a></td>
+      </tr>
     </tbody>
   </table>
-
-  <script>
-    const coins = ["BTCUSDT", "ETHUSDT", "SOLUSDT"];
-
-    async function analyzeAll() {
-      const tbody = document.getElementById("result");
-      tbody.innerHTML = "<tr><td colspan='3'>Loading...</td></tr>";
-
-      const rows = await Promise.all(coins.map(async (symbol) => {
-        try {
-          const res = await fetch(`https://api.bitget.com/api/v2/market/ticker?symbol=${symbol}`);
-          const data = await res.json();
-          const price = parseFloat(data.data.close).toFixed(2);
-
-          // Sinyal dummy: BUY kalau harga naik dari 24h open, SELL kalau turun
-          const change = parseFloat(data.data.change);
-          const signal = change > 0 ? "BUY" : (change < 0 ? "SELL" : "HOLD");
-
-          return `<tr>
-                    <td>${symbol}</td>
-                    <td>${price}</td>
-                    <td>${signal}</td>
-                  </tr>`;
-        } catch (err) {
-          return `<tr><td>${symbol}</td><td colspan='2'>Gagal ambil data</td></tr>`;
-        }
-      }));
-
-      tbody.innerHTML = rows.join("");
-    }
-  </script>
 </body>
 </html>
