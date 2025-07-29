@@ -39,33 +39,94 @@ function rsi(data, period = 14) {
     let rs = gains / (losses || 0.0001);
     return 100 - (100 / (1 + rs));
 }
+function macd(data, shortPeriod = 12, longPeriod = 26, signalPeriod = 9) {
+    if (data.length < longPeriod + signalPeriod) return { macd: null, signal: null, histogram: null };
+    let emaShort = [], emaLong = [];
+    for (let i = longPeriod - shortPeriod; i < data.length; i++) {
+        emaShort.push(ema(data.slice(0, i + shortPeriod), shortPeriod));
+    }
+    for (let i = 0; i < data.length; i++) {
+        emaLong.push(ema(data.slice(0, i + longPeriod), longPeriod));
+    }
+    let macdLine = [];
+    for (let i = 0; i < emaShort.length; i++) {
+        macdLine.push(emaShort[i] - emaLong[i + (shortPeriod - 1)]);
+    }
+    let signalLine = [];
+    for (let i = signalPeriod - 1; i < macdLine.length; i++) {
+        signalLine.push(ema(macdLine.slice(0, i + 1), signalPeriod));
+    }
+    let latestMacd = macdLine[macdLine.length - 1];
+    let latestSignal = signalLine[signalLine.length - 1];
+    let latestHistogram = latestMacd - latestSignal;
+    return { macd: latestMacd, signal: latestSignal, histogram: latestHistogram };
+}
 
-// SIGNAL: Hanya EMA cross up/down, Reason mirip icrypto
-function getSignalAndReasonEMAOnly(lastPrice, prevEma, emaVal, rsiVal, priceAction) {
-    let signal = "Tidak ada sinyal kuat (scalping)";
+function getPriceAction(closes) {
+    const len = closes.length;
+    const last = closes[len - 1];
+    const before = closes[len - 5] || closes[0];
+    if (last > before * 1.01) return "Uptrend";
+    if (last < before * 0.99) return "Downtrend";
+    return "Sideways";
+}
+
+function getVolumeStatus(volumes) {
+    const len = volumes.length;
+    const recent = volumes.slice(len - 5, len);
+    const prev = volumes.slice(len - 10, len - 5);
+    const avgRecent = recent.reduce((a, b) => a + b, 0) / recent.length;
+    const avgPrev = prev.reduce((a, b) => a + b, 0) / prev.length;
+    if (avgRecent > avgPrev * 1.2) return "Volume naik";
+    if (avgRecent < avgPrev * 0.8) return "Volume turun";
+    return "Volume stabil";
+}
+
+function getSignalAndReasonEMA912(closes, volumes, lastPrice, ema9, prevEma9, ema12, prevEma12, rsiVal, maVal, macdVal, priceAction, volStat) {
+    let signal = "Tidak ada sinyal kuat (EMA 9/12)";
     let reason = [];
-    
-    if (prevEma && emaVal && lastPrice < emaVal && prevEma > emaVal) {
-        signal = "EMA Cross Down (scalping)";
-        reason.push(`- Harga cross down EMA (${lastPrice.toFixed(2)} < ${emaVal.toFixed(2)})`);
-        reason.push(`- EMA turun (${emaVal.toFixed(2)} < ${prevEma.toFixed(2)})`);
-        reason.push(`- RSI melemah (${rsiVal !== null ? rsiVal.toFixed(2) : '-'})`);
-        reason.push(`- Tidak ada price action, sinyal sedang`);
-        reason.push(`- Tidak ada doji, sinyal kuat`);
-        reason.push("Sinyal bearish sedang, tetap perhatikan level support.");
-    } else if (prevEma && emaVal && lastPrice > emaVal && prevEma < emaVal) {
-        signal = "EMA Cross Up (scalping)";
-        reason.push(`- Harga cross up EMA (${lastPrice.toFixed(2)} > ${emaVal.toFixed(2)})`);
-        reason.push(`- EMA naik (${emaVal.toFixed(2)} > ${prevEma.toFixed(2)})`);
-        reason.push(`- RSI menguat (${rsiVal !== null ? rsiVal.toFixed(2) : '-'})`);
-        reason.push(`- Tidak ada price action, sinyal sedang`);
-        reason.push(`- Tidak ada doji, sinyal kuat`);
-        reason.push("Sinyal bullish sedang, tetap perhatikan level resistance.");
+
+    // EMA 9/12 Cross Down
+    if (prevEma9 > prevEma12 && ema9 < ema12) {
+        signal = "EMA 9/12 Cross Down";
+        reason.push(`- Harga sekarang: ${lastPrice.toFixed(2)}`);
+        reason.push(`- EMA9 (${ema9.toFixed(2)}) < EMA12 (${ema12.toFixed(2)})`);
+        reason.push(`- EMA9 sebelumnya (${prevEma9.toFixed(2)}) > EMA12 sebelumnya (${prevEma12.toFixed(2)})`);
+        reason.push(`- RSI: ${rsiVal !== null ? rsiVal.toFixed(2) : '-'} (${rsiVal < 40 ? 'melemah' : 'netral'})`);
+        reason.push(`- MA14: ${maVal !== null ? maVal.toFixed(2) : '-'}`);
+        if (macdVal && macdVal.histogram < 0) reason.push(`- MACD Bearish`);
+        else if (macdVal && macdVal.histogram > 0) reason.push(`- MACD Bullish`);
+        else reason.push(`- MACD Netral`);
+        reason.push(`- Price Action: ${priceAction}`);
+        reason.push(`- ${volStat}`);
+        reason.push("Sinyal bearish, hati-hati jika ingin entry BUY.");
+    }
+    // EMA 9/12 Cross Up
+    else if (prevEma9 < prevEma12 && ema9 > ema12) {
+        signal = "EMA 9/12 Cross Up";
+        reason.push(`- Harga sekarang: ${lastPrice.toFixed(2)}`);
+        reason.push(`- EMA9 (${ema9.toFixed(2)}) > EMA12 (${ema12.toFixed(2)})`);
+        reason.push(`- EMA9 sebelumnya (${prevEma9.toFixed(2)}) < EMA12 sebelumnya (${prevEma12.toFixed(2)})`);
+        reason.push(`- RSI: ${rsiVal !== null ? rsiVal.toFixed(2) : '-'} (${rsiVal > 60 ? 'menguat' : 'netral'})`);
+        reason.push(`- MA14: ${maVal !== null ? maVal.toFixed(2) : '-'}`);
+        if (macdVal && macdVal.histogram > 0) reason.push(`- MACD Bullish`);
+        else if (macdVal && macdVal.histogram < 0) reason.push(`- MACD Bearish`);
+        else reason.push(`- MACD Netral`);
+        reason.push(`- Price Action: ${priceAction}`);
+        reason.push(`- ${volStat}`);
+        reason.push("Sinyal bullish, hati-hati jika ingin entry SELL.");
     } else {
-        signal = "Tidak ada sinyal kuat (scalping)";
-        reason.push(`ATR: - , EMA: ${emaVal !== null ? emaVal.toFixed(2) : '-'}, RSI: ${rsiVal !== null ? rsiVal.toFixed(2) : '-'} `);
-        reason.push(`Harga: ${lastPrice !== null ? lastPrice.toFixed(2) : '-'}`);
-        reason.push("Tunggu konfirmasi lebih jelas dari indikator.");
+        signal = "Tidak ada sinyal kuat (EMA 9/12)";
+        reason.push(`- EMA9: ${ema9 !== null ? ema9.toFixed(2) : '-'}`);
+        reason.push(`- EMA12: ${ema12 !== null ? ema12.toFixed(2) : '-'}`);
+        reason.push(`- MA14: ${maVal !== null ? maVal.toFixed(2) : '-'}`);
+        reason.push(`- RSI: ${rsiVal !== null ? rsiVal.toFixed(2) : '-'}`);
+        if (macdVal && macdVal.histogram > 0) reason.push(`- MACD Bullish`);
+        else if (macdVal && macdVal.histogram < 0) reason.push(`- MACD Bearish`);
+        else reason.push(`- MACD Netral`);
+        reason.push(`- Price Action: ${priceAction}`);
+        reason.push(`- ${volStat}`);
+        reason.push("Tunggu konfirmasi EMA cross atau sinyal lain.");
     }
     return { signal, reason };
 }
@@ -101,16 +162,22 @@ document.getElementById('analyzeBtn').onclick = async function() {
         return;
     }
     const closes = candles.map(c => c.close);
+    const volumes = candles.map(c => c.volume);
     const lastPrice = closes[closes.length - 1];
     const support = Math.min(...closes.slice(-20));
     const resistance = Math.max(...closes.slice(-20));
     const rsiVal = rsi(closes, 14);
-    const emaVal = ema(closes, 14);
-    const prevEma = ema(closes.slice(0, closes.length - 1), 14);
-    const priceAction = closes[closes.length - 1] > closes[closes.length - 4] ? "Uptrend" : "Downtrend";
+    const maVal = sma(closes, 14);
+    const ema9 = ema(closes, 9);
+    const ema12 = ema(closes, 12);
+    const prevEma9 = ema(closes.slice(0, closes.length - 1), 9);
+    const prevEma12 = ema(closes.slice(0, closes.length - 1), 12);
+    const macdVal = macd(closes);
+    const priceAction = getPriceAction(closes);
+    const volStat = getVolumeStatus(volumes);
 
-    const { signal, reason } = getSignalAndReasonEMAOnly(
-        lastPrice, prevEma, emaVal, rsiVal, priceAction
+    const { signal, reason } = getSignalAndReasonEMA912(
+        closes, volumes, lastPrice, ema9, prevEma9, ema12, prevEma12, rsiVal, maVal, macdVal, priceAction, volStat
     );
 
     const reasonHtml = `<ul class="reason-list">${reason.map(r => `<li>${r}</li>`).join('')}</ul>`;
