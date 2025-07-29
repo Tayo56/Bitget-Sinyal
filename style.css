@@ -1,0 +1,70 @@
+body {
+    background: #181A20;
+    color: #F4F4F4;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.top-nav {
+    background: #21232b;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.logo {
+    font-weight: bold;
+    color: #ffd600;
+    font-size: 1.3em;
+}
+.nav-links a {
+    color: #F4F4F4;
+    margin-left: 24px;
+    text-decoration: none;
+    font-weight: 500;
+}
+.nav-links a.active, .nav-links a.donate {
+    color: #ffd600;
+}
+main {
+    padding: 32px 16px;
+    max-width: 1000px;
+    margin: auto;
+}
+h1 {
+    margin-bottom: 24px;
+    color: #ffd600;
+}
+.analyzer-controls {
+    margin-bottom: 16px;
+}
+.analyzer-controls select, .analyzer-controls button {
+    background: #21232b;
+    color: #fff;
+    border: 1px solid #ffd600;
+    margin-right: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+#result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: #23262f;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 0.97em;
+}
+#result-table th, #result-table td {
+    padding: 10px 6px;
+    text-align: center;
+    border-bottom: 1px solid #181A20;
+}
+#result-table th {
+    background: #22242e;
+    color: #ffd600;
+}
+a.chart-link {
+    color: #ffd600;
+    text-decoration: underline;
+}
